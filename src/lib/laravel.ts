@@ -1,3 +1,5 @@
+import { laravelApiOrigin, laravelApiUrl } from "@/lib/laravel-url";
+
 export type LaravelStatus = {
   name: string;
   backend: string;
@@ -11,7 +13,7 @@ export type LaravelStatusResult =
   | { ok: false; message: string };
 
 export function laravelApiBaseUrl(): string {
-  return process.env.LARAVEL_API_URL ?? "http://127.0.0.1:8000";
+  return laravelApiOrigin();
 }
 
 export function parseLaravelStatus(value: unknown): LaravelStatus | null {
@@ -42,7 +44,8 @@ export function parseLaravelStatus(value: unknown): LaravelStatus | null {
 
 export async function getLaravelStatus(): Promise<LaravelStatusResult> {
   try {
-    const response = await fetch(`${laravelApiBaseUrl()}/api/status`, {
+    // Origin = https://subnexa-api.onrender.com → GET .../api/status
+    const response = await fetch(laravelApiUrl("/api/status"), {
       cache: "no-store",
     });
 
@@ -63,7 +66,8 @@ export async function getLaravelStatus(): Promise<LaravelStatusResult> {
   } catch {
     return {
       ok: false,
-      message: "Laravel API is not reachable. Start it with npm run dev from the project root.",
+      message:
+        "Laravel API is not reachable. Check LARAVEL_API_URL (origin only, e.g. https://subnexa-api.onrender.com).",
     };
   }
 }

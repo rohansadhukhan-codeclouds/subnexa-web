@@ -22,8 +22,9 @@ Keep copy, catalog data, and new features in that domain: medicines, dosage form
 
 - Next.js 16 App Router, React 19, TypeScript
 - Tailwind CSS 4 and MUI 9
-- Laravel API via `LARAVEL_API_URL` (default `http://127.0.0.1:8000`)
-- Rewrites: `/backend-api/:path*` → Laravel `/api/:path*`
+- Laravel API via `LARAVEL_API_URL` — **origin only** (e.g. `https://subnexa-api.onrender.com`), never `/api/status`
+- Rewrites: `/backend-api/:path*` → `{LARAVEL_API_URL}/api/:path*`
+- Helper: `src/lib/laravel-url.ts` normalizes the origin and builds `/api/...` URLs
 
 ## Layout
 

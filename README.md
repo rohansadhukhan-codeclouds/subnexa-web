@@ -29,19 +29,40 @@ npm install
 cp .env.example .env.local
 ```
 
-`.env.local`:
+Set `LARAVEL_API_URL` to the **API origin only** (no `/api` or `/api/status`):
+
+| Environment | Value |
+| --- | --- |
+| Local API | `http://127.0.0.1:8000` |
+| Production (Render) | `https://subnexa-api.onrender.com` |
+
+`.env.local` (local):
 
 ```
 LARAVEL_API_URL=http://127.0.0.1:8000
 ```
 
-Start the API first, then:
+`.env.production` is already set to the Render origin. On **Vercel**, also add the same env var for Production:
+
+```
+LARAVEL_API_URL=https://subnexa-api.onrender.com
+```
+
+Then:
 
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## How API calls work
+
+| Caller | Request | Becomes |
+| --- | --- | --- |
+| Server (`getLaravelStatus`) | `LARAVEL_API_URL` + `/api/status` | `https://subnexa-api.onrender.com/api/status` |
+| Browser | `/backend-api/status` | rewrite → `https://subnexa-api.onrender.com/api/status` |
+| Browser admin login | `/backend-api/admin/login` | rewrite → `https://subnexa-api.onrender.com/api/admin/login` |
 
 ## Scripts
 
@@ -51,8 +72,6 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run build` | Production build |
 | `npm run start` | Serve the production build |
 | `npm run lint` | ESLint |
-
-Browser calls to `/backend-api/*` are rewritten to the Laravel `/api/*` routes.
 
 ## Related repo
 

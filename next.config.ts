@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
+import { normalizeLaravelApiOrigin } from "./src/lib/laravel-url";
 
-const laravelApiUrl = process.env.LARAVEL_API_URL ?? "http://127.0.0.1:8000";
+// Origin only — never include /api or /api/status here.
+const laravelApiUrl = normalizeLaravelApiOrigin(process.env.LARAVEL_API_URL);
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -8,6 +10,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        // Browser: /backend-api/status → https://subnexa-api.onrender.com/api/status
         source: "/backend-api/:path*",
         destination: `${laravelApiUrl}/api/:path*`,
       },
