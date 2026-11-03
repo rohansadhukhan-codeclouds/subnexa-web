@@ -1,16 +1,38 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
+import { useAdminAuth, type AdminUser } from "@/stores/admin-auth";
 
 type Notice = {
   tone: "error" | "success";
   message: string;
 };
 
+type LoginResponse = {
+  token?: string;
+  token_type?: string;
+  user?: AdminUser;
+};
+
 export function AdminLoginForm() {
+  const router = useRouter();
+  const token = useAdminAuth((state) => state.token);
+  const setSession = useAdminAuth((state) => state.setSession);
+  const [hydrated, setHydrated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (hydrated && token) {
+      router.replace("/admin/dashboard");
+    }
+  }, [hydrated, token, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,15 +63,22 @@ export function AdminLoginForm() {
         return;
       }
 
-      const name =
-        body &&
-        typeof body === "object" &&
-        "name" in body &&
-        typeof body.name === "string"
-          ? body.name
-          : "admin";
+      const parsed = parseLoginResponse(body);
 
-      setNotice({ tone: "success", message: `Signed in as ${name}.` });
+      if (!parsed) {
+        setNotice({
+          tone: "error",
+          message: "Login succeeded but the API did not return a bearer token.",
+        });
+        return;
+      }
+
+      setSession(parsed.token, parsed.user);
+      setNotice({
+        tone: "success",
+        message: `Signed in as ${parsed.user.name}.`,
+      });
+      router.replace("/admin/dashboard");
     } catch {
       setNotice({
         tone: "error",
@@ -58,6 +87,14 @@ export function AdminLoginForm() {
     } finally {
       setPending(false);
     }
+  }
+
+  if (hydrated && token) {
+    return (
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        Already signed in. Redirecting to the dashboard…
+      </p>
+    );
   }
 
   return (
@@ -132,6 +169,36 @@ export function AdminLoginForm() {
       ) : null}
     </form>
   );
+}
+
+function parseLoginResponse(
+  body: unknown,
+): { token: string; user: AdminUser } | null {
+  if (!body || typeof body !== "object") {
+    return null;
+  }
+
+  const data = body as LoginResponse;
+
+  if (typeof data.token !== "string" || data.token.length === 0) {
+    return null;
+  }
+
+  if (
+    !data.user ||
+    typeof data.user.name !== "string" ||
+    typeof data.user.email !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    token: data.token,
+    user: {
+      name: data.user.name,
+      email: data.user.email,
+    },
+  };
 }
 
 function loginErrorMessage(body: unknown): string {
