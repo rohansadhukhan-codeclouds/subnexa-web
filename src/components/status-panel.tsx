@@ -5,6 +5,7 @@ import {
   parseLaravelStatus,
   type LaravelStatusResult,
 } from "@/lib/laravel";
+import { laravelApiUrl } from "@/lib/laravel-url";
 
 type StatusPanelProps = {
   initial: LaravelStatusResult;
@@ -18,7 +19,7 @@ export function StatusPanel({ initial }: StatusPanelProps) {
     setPending(true);
 
     try {
-      const response = await fetch("/backend-api/status", { cache: "no-store" });
+      const response = await fetch(laravelApiUrl("status"), { cache: "no-store" });
 
       if (!response.ok) {
         setResult({

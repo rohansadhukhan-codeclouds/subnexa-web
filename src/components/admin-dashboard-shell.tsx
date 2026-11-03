@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { laravelApiUrl } from "@/lib/laravel-url";
 import { adminAuthHeaders, useAdminAuth } from "@/stores/admin-auth";
 
 export function AdminDashboardShell({ children }: { children: ReactNode }) {
@@ -28,7 +29,7 @@ export function AdminDashboardShell({ children }: { children: ReactNode }) {
     setSigningOut(true);
 
     try {
-      await fetch("/backend-api/admin/logout", {
+      await fetch(laravelApiUrl("admin/logout"), {
         method: "POST",
         headers: adminAuthHeaders(token),
       });

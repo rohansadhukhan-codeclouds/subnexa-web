@@ -1,9 +1,9 @@
 /**
- * LARAVEL_API_URL must be the API origin only, e.g.
- *   https://subnexa-api.onrender.com
- * not .../api or .../api/status.
+ * API origin only, e.g. https://subnexa-api.onrender.com
+ * — never /api or /api/status.
  *
- * Paths like /api/status are appended by callers / Next rewrites.
+ * Browser (client components) must use NEXT_PUBLIC_LARAVEL_API_URL.
+ * Server / next.config can use LARAVEL_API_URL as a fallback.
  */
 export function normalizeLaravelApiOrigin(value: string | undefined): string {
   let origin = (value ?? "http://127.0.0.1:8000").trim();
@@ -16,7 +16,9 @@ export function normalizeLaravelApiOrigin(value: string | undefined): string {
 }
 
 export function laravelApiOrigin(): string {
-  return normalizeLaravelApiOrigin(process.env.LARAVEL_API_URL);
+  return normalizeLaravelApiOrigin(
+    process.env.NEXT_PUBLIC_LARAVEL_API_URL ?? process.env.LARAVEL_API_URL,
+  );
 }
 
 /**
@@ -25,6 +27,7 @@ export function laravelApiOrigin(): string {
  *   laravelApiUrl("status")      → https://host/api/status
  *   laravelApiUrl("/api/status") → https://host/api/status
  *   laravelApiUrl("/status")     → https://host/api/status
+ *   laravelApiUrl("admin/login") → https://host/api/admin/login
  */
 export function laravelApiUrl(path: string): string {
   let suffix = path.trim();

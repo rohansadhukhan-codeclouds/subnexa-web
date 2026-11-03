@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import { laravelApiUrl } from "@/lib/laravel-url";
 import { useAdminAuth, type AdminUser } from "@/stores/admin-auth";
 
 type Notice = {
@@ -42,7 +43,7 @@ export function AdminLoginForm() {
     setNotice(null);
 
     try {
-      const response = await fetch("/backend-api/admin/login", {
+      const response = await fetch(laravelApiUrl("admin/login"), {
         method: "POST",
         headers: {
           Accept: "application/json",

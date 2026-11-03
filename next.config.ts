@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 import { normalizeLaravelApiOrigin } from "./src/lib/laravel-url";
 
 // Origin only — never include /api or /api/status here.
-const laravelApiUrl = normalizeLaravelApiOrigin(process.env.LARAVEL_API_URL);
+const laravelApiUrl = normalizeLaravelApiOrigin(
+  process.env.NEXT_PUBLIC_LARAVEL_API_URL ?? process.env.LARAVEL_API_URL,
+);
 
 const nextConfig: NextConfig = {
   cacheComponents: true,

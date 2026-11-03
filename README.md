@@ -29,7 +29,8 @@ npm install
 cp .env.example .env.local
 ```
 
-Set `LARAVEL_API_URL` to the **API origin only** (no `/api` or `/api/status`):
+Set both env vars to the **API origin only** (no `/api` or `/api/status`).  
+`NEXT_PUBLIC_LARAVEL_API_URL` is required for browser calls (admin login, etc.).
 
 | Environment | Value |
 | --- | --- |
@@ -39,30 +40,27 @@ Set `LARAVEL_API_URL` to the **API origin only** (no `/api` or `/api/status`):
 `.env.local` (local):
 
 ```
+NEXT_PUBLIC_LARAVEL_API_URL=http://127.0.0.1:8000
 LARAVEL_API_URL=http://127.0.0.1:8000
 ```
 
-`.env.production` is already set to the Render origin. On **Vercel**, also add the same env var for Production:
+`.env.production` is already set to the Render origin. On **Vercel**, add both for Production:
 
 ```
+NEXT_PUBLIC_LARAVEL_API_URL=https://subnexa-api.onrender.com
 LARAVEL_API_URL=https://subnexa-api.onrender.com
 ```
 
-Then:
-
-```bash
-npm run dev
-```
+Then restart `npm run dev` (env changes need a restart).
 
 Open [http://localhost:3000](http://localhost:3000).
 
 ## How API calls work
 
-| Caller | Request | Becomes |
-| --- | --- | --- |
-| Server (`getLaravelStatus`) | `LARAVEL_API_URL` + `/api/status` | `https://subnexa-api.onrender.com/api/status` |
-| Browser | `/backend-api/status` | rewrite → `https://subnexa-api.onrender.com/api/status` |
-| Browser admin login | `/backend-api/admin/login` | rewrite → `https://subnexa-api.onrender.com/api/admin/login` |
+| Caller | Request |
+| --- | --- |
+| Browser / server | `laravelApiUrl("admin/login")` → `https://subnexa-api.onrender.com/api/admin/login` |
+| Browser / server | `laravelApiUrl("status")` → `https://subnexa-api.onrender.com/api/status` |
 
 ## Scripts
 
